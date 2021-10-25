@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Player : MonoBehaviour
-{
+public class Player : MonoBehaviour {
     private Rigidbody2D rd2d;
     public float speed;
     public GameObject player;
@@ -20,15 +19,15 @@ public class Player : MonoBehaviour
     private bool facingRight = true;
     public float jumpForce;
     Animator anim;
-
     private bool isOnGround;
     public Transform groundcheck;
     public float checkRadius;
     public LayerMask allGround;
+    private string author = "\nGame created by:\n<b>Edgardo Velazquez</b>";
+    private string extraControls = "\nPress <color=#34eb34>R</color> to play again";
 
     // Start is called before the first frame update
-    void Start()
-    {
+    void Start() {
         rd2d = GetComponent<Rigidbody2D>();
         score.text = $"Score: {scoreValue.ToString()}";
         livesText.text = $"Lives: {lives.ToString()}";
@@ -41,8 +40,7 @@ public class Player : MonoBehaviour
     }
 
     // Update is called once per frame
-    void FixedUpdate()
-    {
+    void FixedUpdate() {
         float hozMovement = Input.GetAxis("Horizontal");
         float vertMovement = Input.GetAxis("Vertical");
         rd2d.AddForce(new Vector2(hozMovement * speed, vertMovement * speed));
@@ -50,7 +48,7 @@ public class Player : MonoBehaviour
         
         if (!isOnGround) {
             anim.SetInteger("State",3);
-        } else {
+        }/* else {
             if (hozMovement != 0) {
                 if (hozMovement == 1 || hozMovement == -1) {
                     anim.SetInteger("State", 2);
@@ -60,11 +58,7 @@ public class Player : MonoBehaviour
             } else {
                 anim.SetInteger("State",0);
             }
-        }
-
-        if (Input.GetKeyDown(KeyCode.Escape)) {
-            Application.Quit();
-        }
+        }*/
 
         if (facingRight == false && hozMovement > 0) {
             Flip();
@@ -74,10 +68,9 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-       if (collision.collider.tag == "Coin")
-        {
+    //Function definitions
+    private void OnCollisionEnter2D(Collision2D collision) {
+       if (collision.collider.tag == "Coin") {
             scoreValue += 1;
             score.text = $"Score: {scoreValue.ToString()}";
             Destroy(collision.collider.gameObject);
@@ -90,7 +83,7 @@ public class Player : MonoBehaviour
                 musicSource.Stop();
                 musicSource.clip = musicWin;
                 musicSource.Play();
-                winText.text="You Win!\nGame created by:\nEdgardo Velazquez";
+                winText.text=$"You Win!{author + extraControls}";
             }
         }
         
@@ -99,20 +92,28 @@ public class Player : MonoBehaviour
             livesText.text = $"Lives: {lives.ToString()}";
             Destroy(collision.collider.gameObject);
             if (lives == 0) {
-                loseText.text="You Lose.";
+                loseText.text=$"You Lose.{author + extraControls}";
                 player.SetActive(false);
             }
         }
-
     }
 
-    private void OnCollisionStay2D(Collision2D collision)
-    {
+    private void OnCollisionStay2D(Collision2D collision) {
+        float hozMovement = Input.GetAxis("Horizontal");
         if (collision.collider.tag == "Ground" && isOnGround) {
             if (Input.GetKey(KeyCode.W)) {
                 rd2d.AddForce(new Vector2(0, jumpForce), ForceMode2D.Impulse);
             }
         } 
+            if (hozMovement != 0) {
+                if (hozMovement == 1 || hozMovement == -1) {
+                    anim.SetInteger("State", 2);
+                } else {
+                    anim.SetInteger("State",1);
+                }
+            } else {
+                anim.SetInteger("State",0);
+            }
     }
 
     void Flip() {
